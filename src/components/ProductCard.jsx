@@ -51,7 +51,7 @@ export default function ProductCard({
             onClick={handleEliminarClick}
             title="Eliminar producto"
           >
-            Eliminar
+            ×
           </button>
         )}
       </div>

@@ -6,6 +6,8 @@ export const useProductos = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
 
+
+
     const obtenerProductos = async () => {
         try {
             setLoading(true);
@@ -18,10 +20,12 @@ export const useProductos = () => {
             setLoading(false);
         }
     };
+
+
     useEffect(() => {
         obtenerProductos();
     }, []);
 
-     
+
     return { error, loading, data, recargarProductos: obtenerProductos };
 };

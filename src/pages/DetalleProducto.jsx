@@ -1,5 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useContext } from "react";
 import { useDetalleProductos } from "../hooks/useDetalleProductos";
+import { UserContext } from "../context/UserContext.jsx";
+import { deleteProducto } from "../services/productosService";
 
 /**
  * Componente que muestra la página de detalle de un producto individual.
@@ -13,9 +16,21 @@ import { useDetalleProductos } from "../hooks/useDetalleProductos";
 export default function DetalleProducto() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { userLogged } = useContext(UserContext);
 
   // Simplificado: Solo usamos el hook con el ID
   const { producto, loading, error } = useDetalleProductos(id);
+
+  const handleEliminar = async () => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
+      try {
+        await deleteProducto(id);
+        navigate("/Productos");
+      } catch (err) {
+        alert("Error al eliminar el producto: " + err.message);
+      }
+    }
+  };
 
   if (loading) return <div className="text-center p-10">Cargando...</div>;
   if (error)
@@ -30,9 +45,29 @@ export default function DetalleProducto() {
 
   return (
     <main className="detalle-container">
-      <button onClick={() => navigate(-1)} className="btn-back">
-        ← Volver
-      </button>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+        }}
+      >
+        <button
+          onClick={() => navigate(-1)}
+          className="btn-back"
+          style={{ margin: 0 }}
+        >
+          ← Volver
+        </button>
+
+        {userLogged && (
+          <button onClick={handleEliminar} className="btn-delete-detail">
+            Eliminar Producto
+          </button>
+        )}
+      </div>
+
       <div className="detalle-content">
         <section className="detalle-info">
           <h1 className="detalle-title">{producto.nombre}</h1>

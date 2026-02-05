@@ -1,11 +1,10 @@
 import { createContext, useState, useEffect } from "react";  
-// Creamos el contexto 
+
 const UserContext = createContext(); 
-// Proveedor del contexto 
+
 export const UserProvider = ({ children }) => {
-// Estado para el login del usuario 
+
   const [userLogged, setUserLogged] = useState(false);
- // Al montar, comprobamos si hay usuario logueado en localStorage   
   useEffect(() => {
     const stored = localStorage.getItem("userLogged");
     if (stored === "true") {
