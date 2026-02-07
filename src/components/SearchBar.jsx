@@ -12,9 +12,10 @@ export default function SearchBar({
   searchTerm,
   onSearchChange,
   placeholder = "Buscar...",
+  className = "",
 }) {
   return (
-    <div className="mb-8 w-full max-w-lg mx-auto">
+    <div className={`mb-8 w-full max-w-lg mx-auto relative ${className}`}>
       <label htmlFor="search-input" className="sr-only">
         {placeholder}
       </label>
@@ -25,7 +26,7 @@ export default function SearchBar({
         value={searchTerm}
         // Llama a la función proporcionada por el padre en cada cambio
         onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full p-3 border-2 border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+        className={`w-full p-3 border-2 border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out ${className}`}
         aria-label={placeholder}
       />
     </div>
