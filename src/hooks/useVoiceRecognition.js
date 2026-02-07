@@ -23,24 +23,30 @@
  */
 import { useState, useEffect, useRef } from "react";
 
+/**
+ * Hook personalizado para gestionar el reconocimiento de voz (SpeechRecognition).
+ * Utiliza la Web Speech API para convertir el habla en texto.
+ * 
+ * @param {Function} onResult - Función callback que recibe el texto reconocido.
+ * @returns {Object} Objeto con el estado de soporte, si está escuchando y la función para iniciar.
+ */
 const useVoiceRecognition = (onResult) => {
+  // Configuración de la API para compatibilidad con distintos navegadores
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
 
+  // Estado que indica si el micrófono está capturando audio
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
+  // Verificamos si el navegador actual soporta la API
   const isSupported = !!SpeechRecognition;
   // Si SpeechRecognition existe → true; si es undefined → false
-
-  const onResultRef = useRef(onResult);
-  useEffect(() => {
-    onResultRef.current = onResult;
-  }, [onResult]);
 
   useEffect(() => {
     if (!isSupported) return;
 
+    // Inicialización del motor de reconocimiento
     const recognition = new SpeechRecognition();
     recognition.lang = "es-ES";
     recognition.continuous = false;
@@ -48,10 +54,11 @@ const useVoiceRecognition = (onResult) => {
 
     recognition.onresult = (event) => {
       const text = event.results[0][0].transcript;
-      if (onResultRef.current) onResultRef.current(text);
+      onResult(text);
       setIsListening(false);
     };
 
+    // Evento: Error durante el reconocimiento
     recognition.onerror = (event) => {
       console.error("Error en reconocimiento:", event.error);
       setIsListening(false);
@@ -60,12 +67,11 @@ const useVoiceRecognition = (onResult) => {
     recognition.onend = () => setIsListening(false);
 
     recognitionRef.current = recognition;
+  }, [SpeechRecognition, onResult, isSupported]);
 
-    return () => {
-      try { recognition.stop(); } catch (e) { }
-    };
-  }, [SpeechRecognition, isSupported]);
-
+  /**
+   * Inicia el proceso de escucha si el navegador lo soporta.
+   */
   const startListening = () => {
     if (!isSupported || !recognitionRef.current) return;
     try {
