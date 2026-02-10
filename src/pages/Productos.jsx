@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import ProductGrid from "../components/ProductGrid.jsx";
 import SearchBar from "../components/SearchBar";
 import { useProductos } from "../hooks/useProducto";
@@ -19,19 +19,13 @@ export default function Productos() {
 
   const voice = useVoiceRecognition((text) => setSearchTerm(text));
 
-  const [localMuebles, setLocalMuebles] = useState([]);
-
-  useEffect(() => {
-    if (muebles) setLocalMuebles(muebles);
-  }, [muebles]);
-
   const handleEliminar = async (id) => {
     if (
       window.confirm("¿Estás seguro de que quieres eliminar este producto?")
     ) {
       try {
         await deleteProducto(id);
-        setLocalMuebles((prev) => prev.filter((p) => p.id !== id));
+        recargarProductos();
       } catch (err) {
         alert(err.message);
       }
@@ -41,15 +35,15 @@ export default function Productos() {
   // Usamos useMemo para memorizar la lista filtrada.
   // Solo se recalcula si 'searchTerm' cambia.
   const filteredMuebles = useMemo(() => {
-    if (!localMuebles) return [];
+    if (!muebles) return [];
     if (!searchTerm) {
-      return localMuebles; // Si no hay término, devuelve la lista completa
+      return muebles; // Si no hay término, devuelve la lista completa
     }
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return localMuebles.filter((mueble) =>
+    return muebles.filter((mueble) =>
       mueble.nombre.toLowerCase().includes(lowerCaseSearchTerm),
     );
-  }, [searchTerm, localMuebles]);
+  }, [searchTerm, muebles]);
 
   // Detectamos si es móvil
   const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -120,7 +114,10 @@ export default function Productos() {
 
         <div className="mt-8 w-full">
           {filteredMuebles.length > 0 ? (
-          <ProductGrid muebles={filteredMuebles} onEliminar={handleEliminar} />
+            <ProductGrid
+              muebles={filteredMuebles}
+              onEliminar={handleEliminar}
+            />
           ) : (
             <p className="col-span-full text-center text-gray-500 p-4">
               No se encontraron muebles con el término "{searchTerm}".
